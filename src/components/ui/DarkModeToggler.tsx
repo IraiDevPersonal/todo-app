@@ -1,21 +1,27 @@
-import { useState, ChangeEvent } from 'react'
-import {
-   DARK_CLASS,
-   DARK_MODE_INIT_STATE,
-   HTML_ELEMENT,
-   HTML_FOR_ID,
-} from '../../utils/constants'
+import { useState, ChangeEvent, useLayoutEffect } from 'react'
+import { DARK_CLASS, DOCUMENT_ELEMENT, HTML_FOR_ID, LIGHT_CLASS } from '../../utils/constants'
 import moon from '../../assets/svg/moon.svg'
 import sun from '../../assets/svg/sun.svg'
 
 export function DarkModeToggler() {
-   const [isDarkModeActive, setIsDarkModeActive] = useState<boolean>(DARK_MODE_INIT_STATE)
+   const [isDarkModeActive, setIsDarkModeActive] = useState<boolean>(false)
 
    const handleToggleDarkMode = (e: ChangeEvent<HTMLInputElement>) => {
       const checked = e.target.checked
       setIsDarkModeActive(checked)
-      HTML_ELEMENT?.classList.toggle(DARK_CLASS)
+      DOCUMENT_ELEMENT.toggle(DARK_CLASS)
+         ? (localStorage.theme = DARK_CLASS)
+         : (localStorage.theme = LIGHT_CLASS)
    }
+
+   useLayoutEffect(() => {
+      const isDarkActive =
+         localStorage.theme === 'dark' ||
+         (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)
+
+      isDarkActive ? DOCUMENT_ELEMENT.add(DARK_CLASS) : DOCUMENT_ELEMENT.remove(DARK_CLASS)
+      setIsDarkModeActive(isDarkActive)
+   }, [])
 
    return (
       <label
